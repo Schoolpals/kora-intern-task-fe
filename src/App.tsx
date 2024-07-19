@@ -9,12 +9,12 @@ function App() {
 
   return (
     <>
-    <Routes>
-      <Route path="/" element={<Landing />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
     </>
-  )
+  );
 }
 
 export default App
