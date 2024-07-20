@@ -65,3 +65,17 @@ body {
   background-color: var(--clr-main-bg);
 }
 
+.loader {
+  border-top-color: var(--button-primary);
+  -webkit-animation: spin 1.5s linear infinite;
+  animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

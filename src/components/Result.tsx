@@ -22,7 +22,7 @@ export default function Results({
           Quiz completed
         </p>
         <p className="text-[2.5rem] md:text-[4rem] pt-[10px] font-medium mb-10 md:mb-16 leading-[100%]">
-         {(score > 3 && score < 7) && "Not Bad"} {score > 6 && "Well Done"}, {userName}
+         {(score > 3 && score < 7) && "Not Bad,"} {score > 6 && "Well Done,"} {userName}
         </p>
       </div>
       <div className="flex flex-col gap-3">
