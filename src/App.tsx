@@ -9,6 +9,7 @@ import Quiz from './pages/Quiz'
 import Signin from './pages/Signin'
 import Signup from './pages/Signup'
 import Dashboard from './pages/Dashboard'
+import PrivateRoute from './components/PrivateRoute'
 
 
 function App() {
@@ -23,7 +24,14 @@ function App() {
               <Route path='/quiz/:id' element={<Quiz />} />
               <Route path='/signup' element={<Signup />} />
               <Route path='/login' element={<Signin />} />
-              <Route path='/dashboard' element={<Dashboard />} />
+              <Route
+                path="/dashboard"
+                element={
+                  <PrivateRoute>
+                    <Dashboard />
+                  </PrivateRoute>
+                }
+              />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
