@@ -26,17 +26,13 @@ const Quiz = () => {
 
     const [quizId, setQuizId] = useState("")
 
-    
     const GetNextQuestion = () => {
         setLoading(true)
-        getKoraQuestions({quesId: questionIndex + 1 ,quizId}).then((data) => {
+        getKoraQuestions({ quesId: questionIndex + 1, quizId }).then((data) => {
             console.log(data)
             setLoading(false)
         })
     }
-    useEffect(() => {
-        GetNextQuestion()
-    }, [questionIndex, quizId])
 
     const filteredQuiz = quizData.quizzes.filter(
         quiz => quiz.title.toLowerCase() === id
@@ -99,16 +95,16 @@ const Quiz = () => {
                         value={userName}
                         onChange={(e) => setUserName(e.target.value)}
                         className='bg-white dark:bg-secondary-dark h-12 w-[100%] mt-6 mb-2 p-1 rounded-md text-[24px] pl-[20px]' ></input>
-                    <Button  loading={loading} text="Submit" handleClick={() => {
+                    <Button loading={loading} text="Submit" handleClick={() => {
                         setisUserNameSet(true)
                         startQuiz(userName).then((data) => {
                             setQuizId(data.quizId)
                         })
-                        } } />
+                    }} />
                 </div>
                 :
                 <div>
-                  {quizFinished === false ?  <div>
+                    {quizFinished === false ? <div>
                         {!loading ? (
                             <div>
                                 {filteredQuiz.map((quiz, idx) => {
@@ -173,12 +169,12 @@ const Quiz = () => {
                             </div>
                         )}
                     </div> :
-                    <Results
-                        userName={userName}
-                        score={score}
-                        icon={filteredQuiz[0].icon}
-                        quizType={filteredQuiz[0].title}
-                    /> }
+                        <Results
+                            userName={userName}
+                            score={score}
+                            icon={filteredQuiz[0].icon}
+                            quizType={filteredQuiz[0].title}
+                        />}
                 </div>
             }
         </div>

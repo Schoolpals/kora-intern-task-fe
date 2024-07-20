@@ -17,9 +17,9 @@ const Landing = () => {
       </div>
       <div>
         <ul className="flex flex-col gap-3 md:gap-6">
-          {["", "", ""].map((e, id) => {
+          {[{name: "Kora", href: "quiz/html"}, {name: "Quidax", href: "quiz/html"}, {name: "PiggyVest", href: "quiz/html"}].map((e, id) => {
             return (
-              <Link to={"quiz/html"} key={id}>
+              <Link to={`${e.href}`} key={id}>
                 <li className="flex items-center gap-3 md:gap-8 p-3 bg-primary dark:bg-secondary-dark rounded-xl text-lg md:text-[1.75rem] font-medium leading-6 cursor-pointer">
                   <img
                     className="⁠p-1 rounded-md md:rounded-xl md:w-[2em] md:h-[2em]"
@@ -28,7 +28,7 @@ const Landing = () => {
                     width={30}
                     height={30}
                   />
-                  HTML
+                  {e.name}
                 </li>
               </Link>
             );
