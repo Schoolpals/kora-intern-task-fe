@@ -1,12 +1,17 @@
 import axios from "../../axios.config";
 import apiRoutes from "../utils/apiroutes";
 
-const baseUrl = "https://quiz-app-syso.onrender.com/"
+const baseUrl = "https://kora-intern-task-backend.onrender.com"
 
 
-export const startQuiz = async (username: string) => {
+interface ISignIn {
+    userName: string,
+    password: string
+}
+
+export const signIn = async ({userName,password}:ISignIn) => {
     try {
-        const response = await axios.post(`${baseUrl}${apiRoutes.startQuiz}`, {username})
+        const response = await axios.post(`${baseUrl}${apiRoutes.signIn}`, {userName,password})
         console.log(response)
         if (response.status === 200) {
             if (response.data.success === true) {
@@ -22,13 +27,16 @@ export const startQuiz = async (username: string) => {
     }
 }
 
-interface IpropsQuestion {
-    quesId: number,
-    quizId: string
+interface ISignUp {
+    firstName: string,
+    lastName: string,
+    email: string,
+    userName: string,
+    password: string
 }
-export const getKoraQuestions = async ({quesId, quizId}: IpropsQuestion) => {
+export const signUp = async ({firstName,lastName,email,userName,password}: ISignUp) => {
     try {
-        const response = await axios.post(`${baseUrl}${apiRoutes.koraQuiz}`, {quesId, quizId})
+        const response = await axios.post(`${baseUrl}${apiRoutes.signUp}`, {firstName,lastName,email,userName,password})
         if (response.status === 200) {
             if (response.data.success === true) {
                 return response.data.data

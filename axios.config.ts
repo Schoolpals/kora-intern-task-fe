@@ -4,7 +4,7 @@ const axiosInstance = axios.create();
 
 axiosInstance.interceptors.request.use(
     (config) => {
-        const accessToken = localStorage.getItem('access_token');
+        const accessToken = sessionStorage.getItem('access_token');
         if (accessToken) {
             config.headers.Authorization = `${accessToken}`;
         }
@@ -18,7 +18,8 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
     (response) => {
         if (response.data.code === 401) {
-            localStorage.removeItem('access_token');
+            sessionStorage.removeItem('access_token');
+            sessionStorage.removeItem('userName');
             return Promise.reject(response.data)
         }
 
@@ -26,9 +27,9 @@ axiosInstance.interceptors.response.use(
     },
     (error) => {
         if (error.response && error.response.status === 401) {
-            localStorage.removeItem('access_token');
+            sessionStorage.removeItem('access_token');
+            sessionStorage.removeItem('userName');
         }
-
         return Promise.reject(error);
     }
 );
