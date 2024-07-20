@@ -23,8 +23,8 @@ const Signin = () => {
         setLoading(true);
         try {
             const data = await signIn({ userName, password: userPassword });
-            sessionStorage.setItem('access_token', data.token);
-            sessionStorage.setItem('userName', data.userName);
+            sessionStorage.setItem('access_token', data.data.token);
+            sessionStorage.setItem('userName', data.data.userName);
             navigate("/dashboard");
         } catch (err) {
             setError("Login failed. UserName or password is incorrect.");

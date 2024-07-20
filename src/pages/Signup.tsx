@@ -35,8 +35,8 @@ const Signup = () => {
         setLoading(true);
         try {
             const data = await signUp({ firstName, lastName, email, userName, password });
-            sessionStorage.setItem('access_token', data.token);
-            sessionStorage.setItem('userName', data.userName);
+            sessionStorage.setItem('access_token', data.data.token);
+            sessionStorage.setItem('userName', data.dat.userName);
             navigate("/dashboard");
         } catch (err) {
             setError("Signup failed. Please try again.");
