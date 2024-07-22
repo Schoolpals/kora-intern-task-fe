@@ -26,6 +26,7 @@ const Quiz = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [quizId, setQuizId] = useState<string>("");
     const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
+    const name = sessionStorage.getItem('userName');
 
     const fetchNextQuestion = (Id: number, QuizId: string) => {
         setLoading(true);
@@ -64,7 +65,7 @@ const Quiz = () => {
                     setLoading(false);
                 });
         } else {
-            
+            console.log(id)
         }
     };
 
@@ -137,6 +138,18 @@ const Quiz = () => {
             }
         }
     }, [quizFinished])
+
+    useEffect(() => {
+        if (name) {
+            setUserName(name)
+        }
+    }, [])
+
+    useEffect(() => {
+        if (userName) {
+            handleUserNameSubmit()
+        }
+    }, [userName])
 
 
     return (

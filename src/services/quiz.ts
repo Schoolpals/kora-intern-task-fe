@@ -123,7 +123,7 @@ export const uploadQuestion = async ({ categoryId, question, answer, options }: 
             {  question, options, answer},
             { params: { categoryId } }
         );
-        console.log(response)
+        console.log(response.data.data)
         if (response.status === 200) {
             if (response.data.message === "Quiz uploaded successfully") {
                 return response.data.data;

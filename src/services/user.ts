@@ -36,6 +36,8 @@ interface ISignUp {
 export const signUp = async ({firstName,lastName,email,userName,password}: ISignUp) => {
     try {
         const response = await axios.post(`${baseUrl}${apiRoutes.signUp}`, {firstName,lastName,email,userName,password})
+        console.log(response.data.success)
+        console.log(response.data.data)
         if (response.status === 200) {
             if (response.data.success === true) {
                 return response.data.data

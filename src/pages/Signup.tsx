@@ -34,11 +34,15 @@ const Signup = () => {
 
         setLoading(true);
         try {
-            const data = await signUp({ firstName, lastName, email, userName, password });
-            sessionStorage.setItem('access_token', data.data.token);
-            sessionStorage.setItem('userName', data.dat.userName);
-            navigate("/dashboard");
+            signUp({ firstName, lastName, email, userName, password }).then((data) => {
+                sessionStorage.setItem('access_token', data.data.token);
+                sessionStorage.setItem('userName', data.data.userName);
+                navigate("/dashboard");
+            })
+
+
         } catch (err) {
+            console.log(err)
             setError("Signup failed. Please try again.");
         } finally {
             setLoading(false);
@@ -58,20 +62,20 @@ const Signup = () => {
                 </div>
                 <div className="space-y-4 w-full lg:w-[800px] mt-6">
                     <div className='flex items-center gap-[10px]'>
-                    <input
-                        placeholder='First Name'
-                        type='text'
-                        value={userInfo.firstName}
-                        onChange={(e) => handleUserInfoChange("firstName", e.target.value)}
-                        className='bg-white dark:bg-secondary-dark h-14 w-full mb-2 p-1 rounded-md text-[24px] pl-[20px]'
-                    />
-                    <input
-                        placeholder='Last Name'
-                        type='text'
-                        value={userInfo.lastName}
-                        onChange={(e) => handleUserInfoChange("lastName", e.target.value)}
-                        className='bg-white dark:bg-secondary-dark h-14 w-full mb-2 p-1 rounded-md text-[24px] pl-[20px]'
-                    />
+                        <input
+                            placeholder='First Name'
+                            type='text'
+                            value={userInfo.firstName}
+                            onChange={(e) => handleUserInfoChange("firstName", e.target.value)}
+                            className='bg-white dark:bg-secondary-dark h-14 w-full mb-2 p-1 rounded-md text-[24px] pl-[20px]'
+                        />
+                        <input
+                            placeholder='Last Name'
+                            type='text'
+                            value={userInfo.lastName}
+                            onChange={(e) => handleUserInfoChange("lastName", e.target.value)}
+                            className='bg-white dark:bg-secondary-dark h-14 w-full mb-2 p-1 rounded-md text-[24px] pl-[20px]'
+                        />
                     </div>
                     <input
                         placeholder='Email'

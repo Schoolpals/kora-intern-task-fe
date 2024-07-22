@@ -13,8 +13,8 @@ const Dashboard = () => {
 
     return (
         <main className='flex flex-col gap-10 pt-8 px-6 lg:px-0 w-[100vw] lg:w-[800px]'>
-            <h2 className="text-xl font-medium md:text-4xl capitalize">
-                Welcome {name}
+            <h2 className="text-xl font-medium md:text-2xl capitalize">
+                Welcome, {name}
             </h2>
 
             <div className='flex gap-[40px]'>
