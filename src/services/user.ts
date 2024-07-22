@@ -3,7 +3,6 @@ import apiRoutes from "../utils/apiroutes";
 
 const baseUrl = "https://kora-intern-task-backend.onrender.com"
 
-
 interface ISignIn {
     userName: string,
     password: string
@@ -23,7 +22,7 @@ export const signIn = async ({userName,password}:ISignIn) => {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
     } catch (error) {
-        throw new Error('Failed to start user');
+        throw new Error('Failed to signin user');
     }
 }
 

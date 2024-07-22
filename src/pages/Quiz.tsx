@@ -1,51 +1,100 @@
 import React, { ChangeEvent, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import QuizOption from '../components/QuizOption';
-import quizData from '../constants/data..json';
 import Button from '../components/Button';
 import Results from '../components/Result';
 import ProgressBar from '../components/ProgressBar';
-import { startQuiz, getKoraQuestions } from "../services/quiz"
-
+import { startQuiz, getKoraQuestions, getPiggyvestQuestions, getQuidaxQuestions, sendUserScores } from "../services/quiz"
+interface Question {
+    question: string;
+    options: string[];
+    answer: number;
+}
 const Quiz = () => {
-    const { id } = useParams();
-    const [userName, setUserName] = useState("")
-    const [isUserNameSet, setisUserNameSet] = useState(false)
-    const [questionIndex, setQuestionIndex] = useState(0);
-    const [answerChoice, setAnswerChoice] = useState('');
-    const [score, setScore] = useState(0);
-    const [correct, setCorrect] = useState(false);
-    const [wrong, setWrong] = useState(false);
-    const [disabled, setDisabled] = useState(false);
-    const [buttonChange, setButtonChange] = useState(false);
-    const [quizFinished, setQuizFinished] = useState(false);
-    const [error, setError] = useState(false);
+    const { id } = useParams<string>();
+    const [userName, setUserName] = useState<string>("");
+    const [isUserNameSet, setIsUserNameSet] = useState<boolean>(false);
+    const [questionIndex, setQuestionIndex] = useState<number>(1);
+    const [answerChoice, setAnswerChoice] = useState<string>("");
+    const [score, setScore] = useState<number>(0);
+    const [correct, setCorrect] = useState<boolean>(false);
+    const [wrong, setWrong] = useState<boolean>(false);
+    const [disabled, setDisabled] = useState<boolean>(false);
+    const [buttonChange, setButtonChange] = useState<boolean>(false);
+    const [quizFinished, setQuizFinished] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string>("");
+    const [loading, setLoading] = useState<boolean>(false);
+    const [quizId, setQuizId] = useState<string>("");
+    const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
 
-    const [loading, setLoading] = useState(false)
+    const fetchNextQuestion = (Id: number, QuizId: string) => {
+        setLoading(true);
+        if (id === "kora") {
+            getKoraQuestions({ quesId: Id, quizId: QuizId })
+                .then((data) => {
+                    setCurrentQuestion(data);
+                    setLoading(false);
+                })
+                .catch((err) => {
+                    console.error("Failed to fetch Question:", err);
+                    setErrorMessage("Failed to fetch Questions");
+                    setLoading(false);
+                });
+        } else if (id === "quidax") {
+            getQuidaxQuestions({ quesId: Id, quizId: QuizId })
+                .then((data) => {
+                    setCurrentQuestion(data);
+                    setLoading(false);
+                })
+                .catch((err) => {
+                    console.error("Failed to fetch Question:", err);
+                    setErrorMessage("Failed to fetch Questions");
+                    setLoading(false);
+                });
+        }
+        else if (id === "piggyvest") {
+            getPiggyvestQuestions({ quesId: Id, quizId: QuizId })
+                .then((data) => {
+                    setCurrentQuestion(data);
+                    setLoading(false);
+                })
+                .catch((err) => {
+                    console.error("Failed to fetch Question:", err);
+                    setErrorMessage("Failed to fetch Questions");
+                    setLoading(false);
+                });
+        } else {
+            
+        }
+    };
 
-
-    const [quizId, setQuizId] = useState("")
-
-    const GetNextQuestion = () => {
-        setLoading(true)
-        getKoraQuestions({ quesId: questionIndex + 1, quizId }).then((data) => {
-            console.log(data)
-            setLoading(false)
-        })
-    }
-
-    const filteredQuiz = quizData.quizzes.filter(
-        quiz => quiz.title.toLowerCase() === id
-    );
-    const answer = filteredQuiz[0]?.questions[questionIndex].answer;
+    const handleUserNameSubmit = () => {
+        if (!userName) {
+            setErrorMessage("Username not set");
+            return;
+        }
+        setLoading(true);
+        startQuiz(userName)
+            .then((data) => {
+                setQuizId(data);
+                fetchNextQuestion(questionIndex, data)
+                setIsUserNameSet(true);
+                setLoading(false);
+            })
+            .catch((err) => {
+                console.error("Failed to start quiz:", err);
+                setErrorMessage("Failed to start Quiz");
+                setLoading(false);
+            });
+    };
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         setAnswerChoice(event.target.value);
     };
 
     const isCorrect = (option: string) => {
-        if (option === answer) {
-            setScore(currScore => currScore + 1);
+        if (option === currentQuestion?.options[currentQuestion?.answer]) {
+            setScore((currScore) => currScore + 1);
             return true;
         }
         setWrong(true);
@@ -53,35 +102,47 @@ const Quiz = () => {
     };
 
     const handleAnswerSubmit = () => {
-        if (answerChoice != '') {
+        if (answerChoice !== '') {
             setCorrect(isCorrect(answerChoice));
             setButtonChange(true);
             setDisabled(true);
-            setError(false);
+            setErrorMessage("");
         } else {
-            setError(true);
+            setErrorMessage("Please select an answer");
         }
     };
 
     const handleNextQuestion = () => {
-        if (questionIndex < filteredQuiz[0].questions.length - 1) {
-            GetNextQuestion()
-            setQuestionIndex(currIndex => currIndex + 1);
+        if (questionIndex < 10) {
+            setQuestionIndex((currIndex) => currIndex + 1);
             setAnswerChoice('');
+            fetchNextQuestion(questionIndex + 1, quizId)
             setCorrect(false);
             setWrong(false);
             setButtonChange(false);
             setDisabled(false);
         } else {
             setQuizFinished(true);
-            setQuestionIndex(0);
+            setQuestionIndex(1);
         }
     };
 
+    useEffect(() => {
+        if (quizFinished) {
+            sendUserScores({ quizId, score })
+        } else {
+            if (score > 0) {
+                fetchNextQuestion(questionIndex, quizId)
+                setScore(0)
+            }
+        }
+    }, [quizFinished])
+
+
     return (
         <div>
-            {!isUserNameSet ?
-                <div className='py-4 px-6 md:px-16 gap-[40px] lg:px-24'>
+            {!isUserNameSet ? (
+                <div className='py-4 px-6 md:px-16 gap-[40px] lg:px-0 w-[100vw] lg:w-[800px]'>
                     <div>
                         <p className="text-sm text-secondary dark:text-secondary-dark italic mb-3 md:text-xl">
                             Quiz
@@ -91,94 +152,83 @@ const Quiz = () => {
                         </h2>
                     </div>
                     <input
-                        placeholder='Enter UserName'
+                        placeholder='UserName'
                         value={userName}
                         onChange={(e) => setUserName(e.target.value)}
-                        className='bg-white dark:bg-secondary-dark h-12 w-[100%] mt-6 mb-2 p-1 rounded-md text-[24px] pl-[20px]' ></input>
-                    <Button loading={loading} text="Submit" handleClick={() => {
-                        setisUserNameSet(true)
-                        startQuiz(userName).then((data) => {
-                            setQuizId(data.quizId)
-                        })
-                    }} />
+                        className='bg-white dark:bg-secondary-dark h-12 w-[100%] mt-6 mb-2 p-1 rounded-md text-[24px] pl-[20px]' />
+                    <Button loading={loading} text="Submit" handleClick={handleUserNameSubmit} />
+                    {errorMessage && <p className="text-red-500 text-base pt-[10px]">{errorMessage}</p>}
                 </div>
-                :
+            ) : (
                 <div>
-                    {quizFinished === false ? <div>
-                        {!loading ? (
-                            <div>
-                                {filteredQuiz.map((quiz, idx) => {
-                                    return (
-                                        <div
-                                            key={idx}
-                                            className="flex flex-col gap-10 pt-8 px-6 lg:grid lg:grid-cols-2 md:px-16 lg:px-24"
-                                        >
+                    {!quizFinished ? (
+                        <div>
+                            {!loading ? (
+                                <div className="flex flex-col gap-10 pt-8 px-6 lg:px-0 lg:grid lg:grid-cols-2 w-[100%] lg:w-[800px]">
+                                    {currentQuestion && (
+                                        <>
                                             <div className='flex flex-col justify-between'>
                                                 <div>
                                                     <p className="text-sm text-secondary dark:text-secondary-dark italic mb-3 md:text-xl">
-                                                        Question {questionIndex + 1} of {quiz.questions.length}
+                                                        Question {questionIndex} of 10
                                                     </p>
                                                     <h2 className="text-xl font-medium md:text-4xl">
-                                                        {quiz.questions[questionIndex].question}
+                                                        {currentQuestion.question}
                                                     </h2>
                                                 </div>
-                                                <ProgressBar progress={questionIndex + 1} />
+                                                <ProgressBar progress={questionIndex} />
                                             </div>
                                             <div>
                                                 <ul className="flex flex-col gap-3">
-                                                    {quiz.questions[questionIndex].options.map((option, idx) => {
-                                                        return (
-                                                            <QuizOption
-                                                                key={idx}
-                                                                option={option}
-                                                                selectedOption={answerChoice}
-                                                                answer={answer}
-                                                                id={idx}
-                                                                selected={answerChoice === option}
-                                                                correct={answer === option && correct}
-                                                                wrong={wrong}
-                                                                disabled={disabled}
-                                                                handleChange={handleChange}
-                                                            />
-                                                        );
-                                                    })}
+                                                    {currentQuestion.options.map((option: string, idx: number) => (
+                                                        <QuizOption
+                                                            key={idx}
+                                                            option={option}
+                                                            selectedOption={answerChoice}
+                                                            answer={currentQuestion.options[currentQuestion.answer]}
+                                                            id={idx}
+                                                            selected={answerChoice === option}
+                                                            correct={correct && answerChoice === option}
+                                                            wrong={wrong && answerChoice === option}
+                                                            disabled={disabled}
+                                                            handleChange={handleChange}
+                                                        />
+                                                    ))}
                                                 </ul>
                                                 {buttonChange ? (
                                                     <Button text="Next Question" loading={loading} handleClick={handleNextQuestion} />
                                                 ) : (
                                                     <Button text="Submit Answer" loading={loading} handleClick={handleAnswerSubmit} />
                                                 )}
-                                                {error && (
+                                                {errorMessage && (
                                                     <span className="flex gap-3 justify-center items-center mt-3 w-full">
-                                                        <img src={"/images/icon-sun-dark.svg"} width={24} height={24} alt="error" />
-                                                        <p className="text-error">Please select an answer</p>
+                                                        <p className="text-red-500 text-base pt-[10px]">{errorMessage}</p>
                                                     </span>
                                                 )}
                                             </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        ) : (
-                            <div className=''>
-                                <div className="flex justify-center pt-[200px] sm:pt-[150px]">
-                                    <div className="loader ease-linear rounded-full border-8 border-t-8 border-blacks-four h-[100px] w-[100px]">
-
+                                        </>
+                                    )}
+                                </div>
+                            ) : (
+                                <div className=''>
+                                    <div className="flex justify-center pt-[200px] sm:pt-[150px]">
+                                        <div className="loader ease-linear rounded-full border-8 border-t-8 border-blacks-four h-[100px] w-[100px]"></div>
                                     </div>
                                 </div>
-                            </div>
-                        )}
-                    </div> :
+                            )}
+                        </div>
+                    ) : (
                         <Results
+                            setQuizFinished={setQuizFinished}
                             userName={userName}
                             score={score}
-                            icon={filteredQuiz[0].icon}
-                            quizType={filteredQuiz[0].title}
-                        />}
+                            quizType={`${id}`}
+                        />
+                    )}
                 </div>
-            }
+            )}
         </div>
-    )
+    );
 }
 
-export default Quiz
+export default Quiz;

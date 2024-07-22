@@ -17,11 +17,11 @@ export default function Header() {
     };
 
     return (
-        <header className="flex justify-between items-center py-4 px-6 md:px-16 gap-[40px] lg:px-24  mb-5">
+        <header className="flex justify-between items-center py-4 px-6 md:px-0 w-[100vw] lg:w-[800px] mb-5 mx-auto">
             <>
                 <Category category={location.pathname.slice(6)} />
             </>
-            <div className="flex items-center gap-[5px] cursor-pointer" onClick={handleToggle}>
+            <div className="flex items-center justify-end gap-[5px] cursor-pointer" onClick={handleToggle}>
                 {darkModeOn ? (
                     <img src={"/images/icon-sun-light.svg"} alt="light mode" />
                 ) : (

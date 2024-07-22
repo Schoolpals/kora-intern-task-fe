@@ -34,7 +34,7 @@ const Signin = () => {
     };
     return (
         <div>
-            <div className='py-4 px-6 md:px-16 gap-[40px] lg:px-24'>
+            <div className='py-4 px-6 lg:px-0 w-[100vw] lg:w-[800px]'>
                 <div>
                     <p className="text-sm text-secondary dark:text-secondary-dark italic mb-3 md:text-xl">
                         Login

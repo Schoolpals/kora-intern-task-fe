@@ -47,7 +47,7 @@ const Signup = () => {
 
     return (
         <div>
-            <div className='py-4 px-6 md:px-16 gap-[40px] lg:px-24'>
+            <div className='py-4 px-6 md:px-0 w-[100vw] lg:w-[800px]'>
                 <div>
                     <p className="text-sm text-secondary dark:text-secondary-dark italic mb-3 md:text-xl">
                         Signup
@@ -56,13 +56,14 @@ const Signup = () => {
                         Create your account
                     </h2>
                 </div>
-                <div className="space-y-4 w-full lg:w-[800px]">
+                <div className="space-y-4 w-full lg:w-[800px] mt-6">
+                    <div className='flex items-center gap-[10px]'>
                     <input
                         placeholder='First Name'
                         type='text'
                         value={userInfo.firstName}
                         onChange={(e) => handleUserInfoChange("firstName", e.target.value)}
-                        className='bg-white dark:bg-secondary-dark h-14 w-full mt-6 mb-2 p-1 rounded-md text-[24px] pl-[20px]'
+                        className='bg-white dark:bg-secondary-dark h-14 w-full mb-2 p-1 rounded-md text-[24px] pl-[20px]'
                     />
                     <input
                         placeholder='Last Name'
@@ -71,6 +72,7 @@ const Signup = () => {
                         onChange={(e) => handleUserInfoChange("lastName", e.target.value)}
                         className='bg-white dark:bg-secondary-dark h-14 w-full mb-2 p-1 rounded-md text-[24px] pl-[20px]'
                     />
+                    </div>
                     <input
                         placeholder='Email'
                         type='email'

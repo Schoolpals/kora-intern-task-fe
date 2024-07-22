@@ -10,13 +10,15 @@ import Signin from './pages/Signin'
 import Signup from './pages/Signup'
 import Dashboard from './pages/Dashboard'
 import PrivateRoute from './components/PrivateRoute'
+import CreateQuiz from './pages/CreateQuiz'
+import ViewQuiz from './pages/ViewQuiz'
 
 
 function App() {
   return (
     <>
       <div className={`text-primary bg-[#F4F6FA] dark:bg-primary-dark dark:text-white min-h-screen`}>
-        <div className='lg:flex justify-center items-center bg-mobile-pattern md:bg-tablet-pattern lg:bg-desktop-pattern dark:bg-mobile-pattern-dark dark:md:bg-tablet-pattern-dark dark:lg:bg-desktop-pattern-dark bg-cover min-h-screen'  >
+        <div className='flex justify-center items-center bg-mobile-pattern md:bg-tablet-pattern lg:bg-desktop-pattern dark:bg-mobile-pattern-dark dark:md:bg-tablet-pattern-dark dark:lg:bg-desktop-pattern-dark bg-cover min-h-screen'  >
           <main>
             <MainHeader />
             <Routes>
@@ -29,6 +31,22 @@ function App() {
                 element={
                   <PrivateRoute>
                     <Dashboard />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/dashboard/create"
+                element={
+                  <PrivateRoute>
+                    <CreateQuiz />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/dashboard/view"
+                element={
+                  <PrivateRoute>
+                    <ViewQuiz />
                   </PrivateRoute>
                 }
               />

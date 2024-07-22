@@ -4,8 +4,10 @@ export default function Button({
   text,
   handleClick,
   loading,
+  disabled
 }: {
   loading: boolean;
+  disabled?: boolean;
   text: string;
   handleClick: React.MouseEventHandler<HTMLButtonElement>;
 }) {
@@ -13,6 +15,7 @@ export default function Button({
     <button
       className="text-white text-lg md:text-[1.75rem] font-medium bg-primary-button rounded-xl md:rounded-xl p-3 md:p-6 mt-3 md:mt-8 hover:opacity-50 w-full"
       onClick={handleClick}
+      disabled={disabled}
     >
       {loading ? <div className='h-[]'>
         <div className="flex justify-center ">

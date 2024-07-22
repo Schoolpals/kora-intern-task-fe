@@ -1,25 +1,26 @@
 'use client';
 
-import { useRoutes } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import React from 'react';
 import Button from './Button';
 
 export default function Results({
   userName,
   score,
-  icon,
   quizType,
+  setQuizFinished,
 }: {
   userName: string
   score: number;
-  icon: string;
   quizType: string;
+  setQuizFinished: any,
 }) {
+  const navigate = useNavigate();
   return (
-    <section className="py-8 px-6 md:px-16 lg:grid lg:grid-cols-2 gap-[40px] lg:px-36">
+    <section className="flex flex-col gap-10 pt-8 px-6 lg:px-0 lg:grid lg:grid-cols-2 w-[100vw] lg:w-[800px]">
       <div>
-        <p className=" text-[2.5rem] md:text-[4rem] font-light leading-[100%]">
-          Quiz completed
+        <p className=" text-[2.5rem] md:text-[3rem] font-light leading-[100%]">
+          Quiz Completed,
         </p>
         <p className="text-[2.5rem] md:text-[4rem] pt-[10px] font-medium mb-10 md:mb-16 leading-[100%]">
          {(score > 3 && score < 7) && "Not Bad,"} {score > 6 && "Well Done,"} {userName}
@@ -40,14 +41,16 @@ export default function Results({
                 alt=""
               />
             </span> */}
-            <p className="text-lg md:text-[1.75rem] font-medium">{quizType}</p>
+            <p className="text-lg md:text-[1.75rem] font-medium capitalize">{quizType}</p>
           </div>
           <p className="text-[5.5rem] md:text-[7rem] py-[50px] font-medium">{score}</p>
           <p className="text-lg md:text-2xl text-secondary dark:text-secondary-dark font-light">
             out of 10
           </p>
         </div>
-        <Button text="Play Again" handleClick={() => {}}></Button>
+        <Button text="Play Again" handleClick={() => { 
+          setQuizFinished(false)
+          } } loading={false}></Button>
       </div>
     </section>
   );
