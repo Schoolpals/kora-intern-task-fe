@@ -325,7 +325,7 @@ const Quiz = () => {
                         </div>
                     ) : (
                         <Results
-                            total={filteredQuiz.length ?? 10}
+                            total={filteredQuiz.length > 0 ? filteredQuiz.length : 10}
                             setQuizFinished={setQuizFinished}
                             userName={userName}
                             score={score}
