@@ -55,8 +55,14 @@ const CreateQuiz = () => {
       setAnswer(0)
       setOptions(['', '', '', ''])
       setSuccessMessage('Question uploaded successfully!');
+      setTimeout(() => {
+        setSuccessMessage("")
+      }, 2000)
     } catch (error) {
       setErrorMessage('Error uploading question');
+      setTimeout(() => {
+        setErrorMessage("")
+      }, 2000)
     } finally {
       setLoading(false);
     }
@@ -139,7 +145,7 @@ const CreateQuiz = () => {
               </div>
               <div className='flex gap-[40px]'>
                 <Button text="Upload Question" handleClick={() => { }} loading={loading} />
-                <Button text="Finish Upload" handleClick={() => { navigate("/dashboard") }} loading={loading} />
+                <Button text="Finish Upload" handleClick={() => { navigate("/dashboard") }} />
               </div>
             </form>
               :

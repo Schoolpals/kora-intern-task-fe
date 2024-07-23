@@ -22,14 +22,14 @@ export default function Results({
         <p className=" text-[2.5rem] md:text-[3rem] font-light leading-[100%]">
           Quiz Completed,
         </p>
-        <p className="text-[2.5rem] md:text-[4rem] pt-[10px] font-medium mb-10 md:mb-16 leading-[100%]">
-         {(score > 3 && score < 7) && "Not Bad,"} {score > 6 && "Well Done,"} {userName}
+        <p className="text-[2.5rem] md:text-[3rem] pt-[10px] font-medium mb-10 md:mb-16 leading-[100%]">
+          {(score > 3 && score < 7) && "Not Bad,"} {score > 6 && "Well Done,"} {userName}
         </p>
       </div>
       <div className="flex flex-col gap-3">
         <div className="flex flex-col justify-center items-center bg-white dark:bg-secondary-dark p-8 md:p-12 rounded-xl md:rounded-3xl shadow-sm">
           <div className="flex items-center gap-4 md:gap-4">
-            <p  className="text-lg md:text-2xl text-secondary dark:text-secondary-dark font-light">Your Score in</p>
+            <p className="text-lg md:text-2xl text-secondary dark:text-secondary-dark font-light">Your Score in</p>
             {/* <span
               className={`flex items-center p-1 rounded-md md:rounded-xl`}
             >
@@ -48,9 +48,14 @@ export default function Results({
             out of 10
           </p>
         </div>
-        <Button text="Play Again" handleClick={() => { 
-          setQuizFinished(false)
-          } } loading={false}></Button>
+        <div className='flex gap-[10px]'>
+          <Button text="Play Again" handleClick={() => {
+            setQuizFinished(false)
+          }} loading={false}></Button>
+          <Button text="Go Home" handleClick={() => {
+            navigate("/")
+          }} loading={false}></Button>
+        </div>
       </div>
     </section>
   );

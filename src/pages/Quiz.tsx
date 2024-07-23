@@ -4,7 +4,7 @@ import QuizOption from '../components/QuizOption';
 import Button from '../components/Button';
 import Results from '../components/Result';
 import ProgressBar from '../components/ProgressBar';
-import { startQuiz, getKoraQuestions, getPiggyvestQuestions, getQuidaxQuestions, sendUserScores } from "../services/quiz"
+import { startQuiz, getKoraQuestions, getPiggyvestQuestions, getQuidaxQuestions, sendUserScores, getQuizQuestions, getCategory } from "../services/quiz"
 interface Question {
     question: string;
     options: string[];
@@ -65,7 +65,16 @@ const Quiz = () => {
                     setLoading(false);
                 });
         } else {
-            console.log(id)
+            getQuizQuestions({ quesId: Id, quizId: QuizId })
+                .then((data) => {
+                    setCurrentQuestion(data.message);
+                    setLoading(false);
+                })
+                .catch((err) => {
+                    console.error("Failed to fetch Question:", err);
+                    setErrorMessage("Failed to fetch Questions");
+                    setLoading(false);
+                });
         }
     };
 
@@ -77,8 +86,17 @@ const Quiz = () => {
         setLoading(true);
         startQuiz(userName)
             .then((data) => {
-                setQuizId(data);
-                fetchNextQuestion(questionIndex, data)
+                if (id !== "kora" && id !== "piggyvest" && id !== "quidax") {
+                    if (id) {
+                        getCategory(id).then((data) => {
+                            setQuizId(data.category.quizId)
+                            fetchNextQuestion(questionIndex, data.category.quizId)
+                        })
+                    }
+                } else {
+                    setQuizId(data);
+                    fetchNextQuestion(questionIndex, data)
+                }
                 setIsUserNameSet(true);
                 setLoading(false);
             })
@@ -149,7 +167,7 @@ const Quiz = () => {
         if (userName) {
             handleUserNameSubmit()
         }
-    }, [userName])
+    }, [name])
 
 
     return (
@@ -193,7 +211,7 @@ const Quiz = () => {
                                             </div>
                                             <div>
                                                 <ul className="flex flex-col gap-3">
-                                                    {currentQuestion.options.map((option: string, idx: number) => (
+                                                    {currentQuestion?.options.map((option: string, idx: number) => (
                                                         <QuizOption
                                                             key={idx}
                                                             option={option}

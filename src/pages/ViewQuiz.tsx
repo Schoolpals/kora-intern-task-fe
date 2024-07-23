@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { getCategoryName } from '../services/quiz'
 import useCopyToClipboard from '../hooks/useCopyToClipBoard';
+import { Link } from 'react-router-dom';
 
 const ViewQuiz = () => {
   const { copyToClipboard } = useCopyToClipboard();
@@ -15,7 +16,10 @@ const ViewQuiz = () => {
   }, [])
   return (
     <div className='py-4 px-6 md:px-16 gap-[40px] lg:px-0 w-[100vw] lg:w-[800px]'>
-      <h2 className="text-xl font-medium md:text-4xl">
+       <Link className="text-lg md:text-[1.75rem] font-medium uppercase" to={'/dashboard'}>
+            Back
+          </Link>
+      <h2 className="text-xl font-medium md:text-4xl pt-[20px]">
         View Quizzes
       </h2>
       <p className="text-sm text-secondary dark:text-secondary-dark italic mb-3 md:text-xl">

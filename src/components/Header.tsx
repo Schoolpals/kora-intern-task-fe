@@ -19,7 +19,7 @@ export default function Header() {
     return (
         <header className="flex justify-between items-center py-4 px-6 md:px-0 w-[100vw] lg:w-[800px] mb-5 mx-auto">
             <>
-                <Category category={location.pathname.slice(6)} />
+                <Category category={location.pathname.slice(6).replace(/%20/g, " ")} />
             </>
             <div className="flex items-center justify-end gap-[5px] cursor-pointer" onClick={handleToggle}>
                 {darkModeOn ? (

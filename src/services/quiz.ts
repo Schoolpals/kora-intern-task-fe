@@ -26,6 +26,25 @@ interface IpropsQuestion {
     quizId: string
 }
 
+export const getQuizQuestions = async ({ quesId, quizId }: IpropsQuestion) => {
+    try {
+        const response = await axios.get(`${baseUrl}${apiRoutes.getQuiz}`, {
+            params: { quesId, quizId },
+        })
+        if (response.status === 200) {
+            if (response.data.success === true) {
+                return response.data.data
+            } else {
+                throw new Error(response.data.message);
+            }
+        } else {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+    } catch (error) {
+        throw new Error('Failed to fetch quiz');
+    }
+}
+
 export const getKoraQuestions = async ({ quesId, quizId }: IpropsQuestion) => {
     try {
         const response = await axios.get(`${baseUrl}${apiRoutes.koraQuiz}`, {

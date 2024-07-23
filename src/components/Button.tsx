@@ -6,7 +6,7 @@ export default function Button({
   loading,
   disabled
 }: {
-  loading: boolean;
+  loading?: boolean;
   disabled?: boolean;
   text: string;
   handleClick: React.MouseEventHandler<HTMLButtonElement>;

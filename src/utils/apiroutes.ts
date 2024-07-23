@@ -11,6 +11,8 @@ quidaxQuiz: "category/quidax-display",
 displayScore: "quiz/display-score",
 //Upload Quiz
 uploadQuiz: "quiz/upload-quiz",
+//Get Quiz
+getQuiz: "quiz/get-quiz",
 //Create Category
 createCategory: "category",
 //get Category
