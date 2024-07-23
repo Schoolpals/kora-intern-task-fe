@@ -26,10 +26,10 @@ interface IpropsQuestion {
     quizId: string
 }
 
-export const getQuizQuestions = async ({ quesId, quizId }: IpropsQuestion) => {
+export const getQuizQuestions = async (categoryId: string) => {
     try {
         const response = await axios.get(`${baseUrl}${apiRoutes.getQuiz}`, {
-            params: { quesId, quizId },
+            params: { categoryId },
         })
         if (response.status === 200) {
             if (response.data.success === true) {
@@ -139,7 +139,7 @@ interface IUpload {
 export const uploadQuestion = async ({ categoryId, question, answer, options }: IUpload) => {
     try {
         const response = await axios.post(`${baseUrl}${apiRoutes.uploadQuiz}`,
-            {  question, options, answer},
+            { question, options, answer },
             { params: { categoryId } }
         );
         console.log(response.data.data)

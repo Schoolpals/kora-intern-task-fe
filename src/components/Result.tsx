@@ -9,7 +9,9 @@ export default function Results({
   score,
   quizType,
   setQuizFinished,
+  total,
 }: {
+  total: number,
   userName: string
   score: number;
   quizType: string;
@@ -45,7 +47,7 @@ export default function Results({
           </div>
           <p className="text-[5.5rem] md:text-[7rem] py-[50px] font-medium">{score}</p>
           <p className="text-lg md:text-2xl text-secondary dark:text-secondary-dark font-light">
-            out of 10
+            out of {total}
           </p>
         </div>
         <div className='flex gap-[10px]'>

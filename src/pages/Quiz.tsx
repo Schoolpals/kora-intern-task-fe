@@ -12,6 +12,8 @@ interface Question {
 }
 const Quiz = () => {
     const { id } = useParams<string>();
+    const name = sessionStorage.getItem('userName');
+
     const [userName, setUserName] = useState<string>("");
     const [isUserNameSet, setIsUserNameSet] = useState<boolean>(false);
     const [questionIndex, setQuestionIndex] = useState<number>(1);
@@ -25,58 +27,50 @@ const Quiz = () => {
     const [errorMessage, setErrorMessage] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
     const [quizId, setQuizId] = useState<string>("");
+    const [categoryId, setcategoryId] = useState<string>("");
     const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
-    const name = sessionStorage.getItem('userName');
+    const [filteredQuiz, setFilteredQuiz] = useState([])
 
     const fetchNextQuestion = (Id: number, QuizId: string) => {
         setLoading(true);
+        
+        const fetchQuestions = (fetchFunction: Function) => {
+            fetchFunction({ quesId: Id, quizId: QuizId })
+                .then((data: any) => {
+                    setCurrentQuestion(data);
+                    setLoading(false);
+                })
+                .catch((err: any) => {
+                    console.error("Failed to fetch Question:", err);
+                    setErrorMessage("Failed to fetch Questions");
+                    setLoading(false);
+                });
+        };
+    
         if (id === "kora") {
-            getKoraQuestions({ quesId: Id, quizId: QuizId })
-                .then((data) => {
-                    setCurrentQuestion(data);
-                    setLoading(false);
-                })
-                .catch((err) => {
-                    console.error("Failed to fetch Question:", err);
-                    setErrorMessage("Failed to fetch Questions");
-                    setLoading(false);
-                });
+            fetchQuestions(getKoraQuestions);
         } else if (id === "quidax") {
-            getQuidaxQuestions({ quesId: Id, quizId: QuizId })
-                .then((data) => {
-                    setCurrentQuestion(data);
-                    setLoading(false);
-                })
-                .catch((err) => {
-                    console.error("Failed to fetch Question:", err);
-                    setErrorMessage("Failed to fetch Questions");
-                    setLoading(false);
-                });
-        }
-        else if (id === "piggyvest") {
-            getPiggyvestQuestions({ quesId: Id, quizId: QuizId })
-                .then((data) => {
-                    setCurrentQuestion(data);
-                    setLoading(false);
-                })
-                .catch((err) => {
-                    console.error("Failed to fetch Question:", err);
-                    setErrorMessage("Failed to fetch Questions");
-                    setLoading(false);
-                });
-        } else {
-            getQuizQuestions({ quesId: Id, quizId: QuizId })
-                .then((data) => {
-                    setCurrentQuestion(data.message);
-                    setLoading(false);
-                })
-                .catch((err) => {
-                    console.error("Failed to fetch Question:", err);
-                    setErrorMessage("Failed to fetch Questions");
-                    setLoading(false);
-                });
+            fetchQuestions(getQuidaxQuestions);
+        } else if (id === "piggyvest") {
+            fetchQuestions(getPiggyvestQuestions);
         }
     };
+    
+
+    const FetchQuestion = (categoryId: string) => {
+        const res = getQuizQuestions(categoryId)
+            .then((data) => {
+                const datas = data
+                setFilteredQuiz(data);
+                setCurrentQuestion(datas[0]);
+                setLoading(false);
+            })
+            .catch((err) => {
+                console.error("Failed to fetch Question:", err);
+                setErrorMessage("Failed to fetch Questions");
+                setLoading(false);
+            });
+    }
 
     const handleUserNameSubmit = () => {
         if (!userName) {
@@ -86,11 +80,13 @@ const Quiz = () => {
         setLoading(true);
         startQuiz(userName)
             .then((data) => {
+                setQuizId(data)
                 if (id !== "kora" && id !== "piggyvest" && id !== "quidax") {
                     if (id) {
+                        setQuestionIndex(0)
                         getCategory(id).then((data) => {
-                            setQuizId(data.category.quizId)
-                            fetchNextQuestion(questionIndex, data.category.quizId)
+                            setcategoryId(data.category.categoryId)
+                            FetchQuestion(data.category.categoryId)
                         })
                     }
                 } else {
@@ -121,28 +117,61 @@ const Quiz = () => {
     };
 
     const handleAnswerSubmit = () => {
-        if (answerChoice !== '') {
-            setCorrect(isCorrect(answerChoice));
-            setButtonChange(true);
-            setDisabled(true);
-            setErrorMessage("");
+        if (id !== "kora" && id !== "piggyvest" && id !== "quidax") {
+            if (id) {
+                if (currentQuestion) {
+                    if (answerChoice === currentQuestion.options[currentQuestion.answer]) {
+                        setScore((currScore) => currScore + 1);
+                        setCorrect(true);
+                    } else {
+                        setWrong(true);
+                    }
+                    setDisabled(true);
+                    setButtonChange(true);
+                }
+            }
         } else {
-            setErrorMessage("Please select an answer");
+            if (answerChoice !== '') {
+                setCorrect(isCorrect(answerChoice));
+                setButtonChange(true);
+                setDisabled(true);
+                setErrorMessage("");
+            } else {
+                setErrorMessage("Please select an answer");
+            }
         }
     };
 
     const handleNextQuestion = () => {
-        if (questionIndex < 10) {
-            setQuestionIndex((currIndex) => currIndex + 1);
-            setAnswerChoice('');
-            fetchNextQuestion(questionIndex + 1, quizId)
-            setCorrect(false);
-            setWrong(false);
-            setButtonChange(false);
-            setDisabled(false);
-        } else {
-            setQuizFinished(true);
-            setQuestionIndex(1);
+        if (id !== "kora" && id !== "piggyvest" && id !== "quidax") {
+            if (id) {
+                if (questionIndex < filteredQuiz.length - 1) {
+                    setQuestionIndex(questionIndex + 1);
+                    setCurrentQuestion(filteredQuiz[questionIndex + 1]);
+                    setAnswerChoice('');
+                    setCorrect(false);
+                    setWrong(false);
+                    setDisabled(false);
+                    setButtonChange(false);
+                } else {
+                    setQuizFinished(true)
+                    setQuestionIndex(0);
+                }
+            }
+        }
+        else {
+            if (questionIndex < 10) {
+                setQuestionIndex((currIndex) => currIndex + 1);
+                setAnswerChoice('');
+                fetchNextQuestion(questionIndex + 1, quizId)
+                setCorrect(false);
+                setWrong(false);
+                setButtonChange(false);
+                setDisabled(false);
+            } else {
+                setQuizFinished(true);
+                setQuestionIndex(1);
+            }
         }
     };
 
@@ -152,6 +181,7 @@ const Quiz = () => {
         } else {
             if (score > 0) {
                 fetchNextQuestion(questionIndex, quizId)
+                FetchQuestion(categoryId)
                 setScore(0)
             }
         }
@@ -168,7 +198,6 @@ const Quiz = () => {
             handleUserNameSubmit()
         }
     }, [name])
-
 
     return (
         <div>
@@ -195,50 +224,96 @@ const Quiz = () => {
                     {!quizFinished ? (
                         <div>
                             {!loading ? (
-                                <div className="flex flex-col gap-10 pt-8 px-6 lg:px-0 lg:grid lg:grid-cols-2 w-[100%] lg:w-[800px]">
-                                    {currentQuestion && (
-                                        <>
-                                            <div className='flex flex-col justify-between'>
-                                                <div>
-                                                    <p className="text-sm text-secondary dark:text-secondary-dark italic mb-3 md:text-xl">
-                                                        Question {questionIndex} of 10
-                                                    </p>
-                                                    <h2 className="text-xl font-medium md:text-4xl">
-                                                        {currentQuestion.question}
-                                                    </h2>
+                                <div>
+                                    {(id !== "kora" && id !== "piggyvest" && id !== "quidax") ? <div className="flex flex-col gap-10 pt-8 px-6 lg:px-0 lg:grid lg:grid-cols-2 w-[100%] lg:w-[800px]">
+                                        {currentQuestion && (
+                                            <>
+                                                <div className='flex flex-col justify-between'>
+                                                    <div>
+                                                        <p className="text-sm text-secondary dark:text-secondary-dark italic mb-3 md:text-xl">
+                                                            Question {questionIndex + 1} of {filteredQuiz.length}
+                                                        </p>
+                                                        <h2 className="text-xl font-medium md:text-4xl">
+                                                            {currentQuestion.question}
+                                                        </h2>
+                                                    </div>
+                                                    <ProgressBar progress={(questionIndex + 1)} total={filteredQuiz.length} />
                                                 </div>
-                                                <ProgressBar progress={questionIndex} />
-                                            </div>
-                                            <div>
-                                                <ul className="flex flex-col gap-3">
-                                                    {currentQuestion?.options.map((option: string, idx: number) => (
-                                                        <QuizOption
-                                                            key={idx}
-                                                            option={option}
-                                                            selectedOption={answerChoice}
-                                                            answer={currentQuestion.options[currentQuestion.answer]}
-                                                            id={idx}
-                                                            selected={answerChoice === option}
-                                                            correct={correct && answerChoice === option}
-                                                            wrong={wrong && answerChoice === option}
-                                                            disabled={disabled}
-                                                            handleChange={handleChange}
-                                                        />
-                                                    ))}
-                                                </ul>
-                                                {buttonChange ? (
-                                                    <Button text="Next Question" loading={loading} handleClick={handleNextQuestion} />
-                                                ) : (
-                                                    <Button text="Submit Answer" loading={loading} handleClick={handleAnswerSubmit} />
-                                                )}
-                                                {errorMessage && (
-                                                    <span className="flex gap-3 justify-center items-center mt-3 w-full">
-                                                        <p className="text-red-500 text-base pt-[10px]">{errorMessage}</p>
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </>
-                                    )}
+                                                <div>
+                                                    <ul className="flex flex-col gap-3">
+                                                        {currentQuestion?.options.map((option: string, idx: number) => (
+                                                            <QuizOption
+                                                                key={idx}
+                                                                option={option}
+                                                                selectedOption={answerChoice}
+                                                                answer={currentQuestion.options[currentQuestion.answer]}
+                                                                id={idx}
+                                                                selected={answerChoice === option}
+                                                                correct={correct && answerChoice === option}
+                                                                wrong={wrong && answerChoice === option}
+                                                                disabled={disabled}
+                                                                handleChange={handleChange}
+                                                            />
+                                                        ))}
+                                                    </ul>
+                                                    {buttonChange ? (
+                                                        <Button text="Next Question" loading={loading} handleClick={handleNextQuestion} />
+                                                    ) : (
+                                                        <Button text="Submit Answer" loading={loading} handleClick={handleAnswerSubmit} />
+                                                    )}
+                                                    {errorMessage && (
+                                                        <span className="flex gap-3 justify-center items-center mt-3 w-full">
+                                                            <p className="text-red-500 text-base pt-[10px]">{errorMessage}</p>
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </>
+                                        )}
+                                    </div> : <div className="flex flex-col gap-10 pt-8 px-6 lg:px-0 lg:grid lg:grid-cols-2 w-[100%] lg:w-[800px]">
+                                        {currentQuestion && (
+                                            <>
+                                                <div className='flex flex-col justify-between'>
+                                                    <div>
+                                                        <p className="text-sm text-secondary dark:text-secondary-dark italic mb-3 md:text-xl">
+                                                            Question {questionIndex} of 10
+                                                        </p>
+                                                        <h2 className="text-xl font-medium md:text-4xl">
+                                                            {currentQuestion.question}
+                                                        </h2>
+                                                    </div>
+                                                    <ProgressBar progress={questionIndex} total={10} />
+                                                </div>
+                                                <div>
+                                                    <ul className="flex flex-col gap-3">
+                                                        {currentQuestion?.options.map((option: string, idx: number) => (
+                                                            <QuizOption
+                                                                key={idx}
+                                                                option={option}
+                                                                selectedOption={answerChoice}
+                                                                answer={currentQuestion.options[currentQuestion.answer]}
+                                                                id={idx}
+                                                                selected={answerChoice === option}
+                                                                correct={correct && answerChoice === option}
+                                                                wrong={wrong && answerChoice === option}
+                                                                disabled={disabled}
+                                                                handleChange={handleChange}
+                                                            />
+                                                        ))}
+                                                    </ul>
+                                                    {buttonChange ? (
+                                                        <Button text="Next Question" loading={loading} handleClick={handleNextQuestion} />
+                                                    ) : (
+                                                        <Button text="Submit Answer" loading={loading} handleClick={handleAnswerSubmit} />
+                                                    )}
+                                                    {errorMessage && (
+                                                        <span className="flex gap-3 justify-center items-center mt-3 w-full">
+                                                            <p className="text-red-500 text-base pt-[10px]">{errorMessage}</p>
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>}
                                 </div>
                             ) : (
                                 <div className=''>
@@ -250,6 +325,7 @@ const Quiz = () => {
                         </div>
                     ) : (
                         <Results
+                            total={filteredQuiz.length ?? 10}
                             setQuizFinished={setQuizFinished}
                             userName={userName}
                             score={score}
