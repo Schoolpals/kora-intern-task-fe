@@ -90,7 +90,7 @@ const CreateQuiz = () => {
 
         {isCategoryName &&
           <div>
-            {count < 9 ? <form onSubmit={handleSubmit}>
+            {count < 10 ? <form onSubmit={handleSubmit}>
               <div className='flex justify-between'>
                 <h2 className="text-xl font-medium md:text-4xl">
                   Enter your Quiz Details
