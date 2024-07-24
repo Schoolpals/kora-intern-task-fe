@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import QuizOption from '../components/QuizOption';
 import Button from '../components/Button';
 import Results from '../components/Result';
@@ -12,6 +12,7 @@ interface Question {
 }
 const Quiz = () => {
     const { id } = useParams<string>();
+    const navigate = useNavigate();
     const name = sessionStorage.getItem('userName');
 
     const [userName, setUserName] = useState<string>("");
@@ -33,7 +34,7 @@ const Quiz = () => {
 
     const fetchNextQuestion = (Id: number, QuizId: string) => {
         setLoading(true);
-        
+
         const fetchQuestions = (fetchFunction: Function) => {
             fetchFunction({ quesId: Id, quizId: QuizId })
                 .then((data: any) => {
@@ -46,7 +47,7 @@ const Quiz = () => {
                     setLoading(false);
                 });
         };
-    
+
         if (id === "kora") {
             fetchQuestions(getKoraQuestions);
         } else if (id === "quidax") {
@@ -55,7 +56,7 @@ const Quiz = () => {
             fetchQuestions(getPiggyvestQuestions);
         }
     };
-    
+
 
     const FetchQuestion = (categoryId: string) => {
         const res = getQuizQuestions(categoryId)
@@ -301,9 +302,15 @@ const Quiz = () => {
                                                         ))}
                                                     </ul>
                                                     {buttonChange ? (
-                                                        <Button text="Next Question" loading={loading} handleClick={handleNextQuestion} />
+                                                        <div className='flex gap-[10px]'>
+                                                            <Button text="Next Question" loading={loading} handleClick={handleNextQuestion} />
+                                                            <Button text="Cancel Quiz" loading={loading} handleClick={() => navigate("/")} />
+                                                        </div>
                                                     ) : (
-                                                        <Button text="Submit Answer" loading={loading} handleClick={handleAnswerSubmit} />
+                                                        <div className='flex gap-[10px]'>
+                                                            <Button text="Submit Answer" loading={loading} handleClick={handleAnswerSubmit} />
+                                                            <Button text="Cancel Quiz" loading={loading} handleClick={() => navigate("/")} />
+                                                        </div>
                                                     )}
                                                     {errorMessage && (
                                                         <span className="flex gap-3 justify-center items-center mt-3 w-full">
