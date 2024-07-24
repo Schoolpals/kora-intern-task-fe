@@ -205,8 +205,8 @@ const Quiz = () => {
             {!isUserNameSet ? (
                 <div className='py-4 px-6 md:px-16 gap-[40px] lg:px-0 w-[100vw] lg:w-[800px]'>
                     <div>
-                        <p className="text-sm text-secondary dark:text-secondary-dark italic mb-3 md:text-xl">
-                            Quiz
+                        <p onClick={() => navigate("/")} className="cursor-pointer text-sm text-secondary dark:text-secondary-dark mb-3 md:text-xl pb-[20px]">
+                            Back to Home
                         </p>
                         <h2 className="text-xl font-medium md:text-4xl">
                             Enter your Username
