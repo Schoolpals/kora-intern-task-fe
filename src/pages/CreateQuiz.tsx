@@ -2,6 +2,7 @@ import React, { ChangeEvent, FormEvent, useState } from 'react'
 import Button from '../components/Button';
 import { createCategory, uploadQuestion } from '../services/quiz';
 import { useNavigate } from 'react-router-dom';
+import DashboardLayout from '../components/DashboardLayout';
 
 interface Question {
   question: string;
@@ -68,7 +69,8 @@ const CreateQuiz = () => {
     }
   };
   return (
-    <div className='py-4 px-6 md:px-16 gap-[40px] lg:px-0 w-[100vw] lg:w-[800px]'>
+    <DashboardLayout>
+    <div className='py-4 px-6 md:px-16 gap-[40px] lg:px-0 w-fit lg:w-[800px]'>
       <div>
         {!isCategoryName && <div className=''>
           <div>
@@ -124,7 +126,7 @@ const CreateQuiz = () => {
                   />
                 ))}
               </div>
-              {options[0].length > 1 && <div className='flex items-center gap-[20px]'>
+              {options[0].length > 0 && <div className='flex items-center gap-[20px]'>
                 <label className="text-xl font-medium md:text-4xl">Answer:</label>
                 <select
                   value={answer}
@@ -145,7 +147,13 @@ const CreateQuiz = () => {
               </div>
               <div className='flex gap-[40px]'>
                 <Button text="Upload Question" handleClick={() => { }} loading={loading} />
-                <Button text="Finish Upload" handleClick={() => { navigate("/dashboard") }} />
+                <Button text="Finish Upload" handleClick={() => {
+                  (e) => {
+                    handleSubmit(e).then(() => {
+                      navigate("/dashboard")
+                    })
+                  }
+                }} loading={loading} />
               </div>
             </form>
               :
@@ -160,6 +168,7 @@ const CreateQuiz = () => {
         }
       </div>
     </div>
+    </DashboardLayout>
   )
 }
 

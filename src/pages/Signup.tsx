@@ -53,12 +53,9 @@ const Signup = () => {
         <div>
             <div className='py-4 px-6 md:px-0 w-[100vw] lg:w-[800px]'>
                 <div>
-                    <p className="text-sm text-secondary dark:text-secondary-dark italic mb-3 md:text-xl">
-                        Signup
-                    </p>
-                    <h2 className="text-xl font-medium md:text-4xl">
+                    <p className="text-sm text-secondary dark:text-secondary-dark italic md:text-2xl">
                         Create your account
-                    </h2>
+                    </p>
                 </div>
                 <div className="space-y-4 w-full lg:w-[800px] mt-6">
                     <div className='flex items-center gap-[10px]'>
@@ -104,7 +101,7 @@ const Signup = () => {
                 )}
                 <Button text="Submit" handleClick={handleSubmit} loading={loading} />
                 <p className="text-sm text-center pt-[10px] mb-3 md:text-xl">
-                    Have an account? <Link className='hover:underline cursor-pointer' to={'/login'}>Sign in</Link>
+                    Have an account? <Link className='hover:underline hover:text-dark-purple cursor-pointer' to={'/login'}>Sign in</Link>
                 </p>
             </div>
         </div>

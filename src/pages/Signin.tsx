@@ -36,12 +36,12 @@ const Signin = () => {
         <div>
             <div className='py-4 px-6 lg:px-0 w-[100vw] lg:w-[800px]'>
                 <div>
-                    <p className="text-sm text-secondary dark:text-secondary-dark italic mb-3 md:text-xl">
-                        Login
+                    <p className="text-sm text-secondary dark:text-secondary-dark italic md:text-2xl">
+                    Enter your Details
                     </p>
-                    <h2 className="text-xl font-medium md:text-4xl">
-                        Enter your Username
-                    </h2>
+                    {/* <h2 className="text-xl font-medium md:text-3xl">
+                        Enter your Details
+                    </h2> */}
                 </div>
                 <div className="space-y-4 w-full lg:w-[800px] pb-[20px]">
                     <input
@@ -62,7 +62,7 @@ const Signin = () => {
                 )}
                 <Button text="Submit" loading={loading} handleClick={handleSubmit} />
                 <p className="text-sm text-center pt-[10px] mb-3 md:text-xl">
-                    New here? <Link className='hover:underline cursor-pointer' to={'/signup'}>Sign up</Link>
+                    New here? <Link className='hover:underline hover:text-dark-purple cursor-pointer' to={'/signup'}>Sign up</Link>
                 </p>
 
             </div>

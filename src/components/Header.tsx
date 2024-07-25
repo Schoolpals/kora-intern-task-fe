@@ -17,10 +17,15 @@ export default function Header() {
     };
 
     return (
-        <header className="flex justify-between items-center py-4 px-6 md:px-0 w-[100vw] lg:w-[800px] mb-5 mx-auto">
+        location.pathname.includes('/dashboard') ? "" : <header className="flex justify-between items-center py-4 px-6 md:px-0 w-[100vw] lg:w-[800px] mb-5 mx-auto">
             <>
-                <Category category={location.pathname.slice(6).replace(/%20/g, " ")} />
+                <Category />
             </>
+            <p className="text-lg md:text-[1.75rem] font-medium uppercase">
+                {location.pathname.includes("quiz") && location.pathname.slice(6).replace(/%20/g, " ")}
+                {location.pathname.includes("login") && location.pathname.slice(1)}
+                {location.pathname.includes("signup") && location.pathname.slice(1)}
+            </p>
             <div className="flex items-center justify-end gap-[5px] cursor-pointer" onClick={handleToggle}>
                 {darkModeOn ? (
                     <img src={"/images/icon-sun-light.svg"} alt="light mode" />
