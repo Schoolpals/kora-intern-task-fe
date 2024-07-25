@@ -1,0 +1,348 @@
+import React, { ChangeEvent, useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom';
+import QuizOption from '../components/QuizOption';
+import Button from '../components/Button';
+import Results from '../components/Result';
+import ProgressBar from '../components/ProgressBar';
+import { startQuiz, getKoraQuestions, getPiggyvestQuestions, getQuidaxQuestions, sendUserScores, getQuizQuestions, getCategory } from "../services/quiz"
+interface Question {
+    question: string;
+    options: string[];
+    answer: number;
+}
+const Quiz = () => {
+    const { id } = useParams<string>();
+    const navigate = useNavigate();
+    const name = sessionStorage.getItem('userName');
+
+    const [userName, setUserName] = useState<string>("");
+    const [isUserNameSet, setIsUserNameSet] = useState<boolean>(false);
+    const [questionIndex, setQuestionIndex] = useState<number>(1);
+    const [answerChoice, setAnswerChoice] = useState<string>("");
+    const [score, setScore] = useState<number>(0);
+    const [correct, setCorrect] = useState<boolean>(false);
+    const [wrong, setWrong] = useState<boolean>(false);
+    const [disabled, setDisabled] = useState<boolean>(false);
+    const [buttonChange, setButtonChange] = useState<boolean>(false);
+    const [quizFinished, setQuizFinished] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string>("");
+    const [loading, setLoading] = useState<boolean>(false);
+    const [quizId, setQuizId] = useState<string>("");
+    const [categoryId, setcategoryId] = useState<string>("");
+    const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
+    const [filteredQuiz, setFilteredQuiz] = useState([])
+
+    const fetchNextQuestion = (Id: number, QuizId: string) => {
+        setLoading(true);
+
+        const fetchQuestions = (fetchFunction: Function) => {
+            fetchFunction({ quesId: Id, quizId: QuizId })
+                .then((data: any) => {
+                    setCurrentQuestion(data);
+                    setLoading(false);
+                })
+                .catch((err: any) => {
+                    console.error("Failed to fetch Question:", err);
+                    setErrorMessage("Failed to fetch Questions");
+                    setLoading(false);
+                });
+        };
+
+        if (id === "kora") {
+            fetchQuestions(getKoraQuestions);
+        } else if (id === "quidax") {
+            fetchQuestions(getQuidaxQuestions);
+        } else if (id === "piggyvest") {
+            fetchQuestions(getPiggyvestQuestions);
+        }
+    };
+
+
+    const FetchQuestion = (categoryId: string) => {
+        const res = getQuizQuestions(categoryId)
+            .then((data) => {
+                const datas = data
+                setFilteredQuiz(data);
+                setCurrentQuestion(datas[0]);
+                setLoading(false);
+            })
+            .catch((err) => {
+                console.error("Failed to fetch Question:", err);
+                setErrorMessage("Failed to fetch Questions");
+                setLoading(false);
+            });
+    }
+
+    const handleUserNameSubmit = () => {
+        if (!userName) {
+            setErrorMessage("Username not set");
+            return;
+        }
+        setLoading(true);
+        startQuiz(userName)
+            .then((data) => {
+                setQuizId(data)
+                if (id !== "kora" && id !== "piggyvest" && id !== "quidax") {
+                    if (id) {
+                        setQuestionIndex(0)
+                        getCategory(id).then((data) => {
+                            setcategoryId(data.category.categoryId)
+                            FetchQuestion(data.category.categoryId)
+                        })
+                    }
+                } else {
+                    setQuizId(data);
+                    fetchNextQuestion(questionIndex, data)
+                }
+                setIsUserNameSet(true);
+                setLoading(false);
+            })
+            .catch((err) => {
+                console.error("Failed to start quiz:", err);
+                setErrorMessage("Failed to start Quiz");
+                setLoading(false);
+            });
+    };
+
+    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setAnswerChoice(event.target.value);
+    };
+
+    const isCorrect = (option: string) => {
+        if (option === currentQuestion?.options[currentQuestion?.answer]) {
+            setScore((currScore) => currScore + 1);
+            return true;
+        }
+        setWrong(true);
+        return false;
+    };
+
+    const handleAnswerSubmit = () => {
+        if (id !== "kora" && id !== "piggyvest" && id !== "quidax") {
+            if (id) {
+                if (currentQuestion) {
+                    if (answerChoice === currentQuestion.options[currentQuestion.answer]) {
+                        setScore((currScore) => currScore + 1);
+                        setCorrect(true);
+                    } else {
+                        setWrong(true);
+                    }
+                    setDisabled(true);
+                    setButtonChange(true);
+                }
+            }
+        } else {
+            if (answerChoice !== '') {
+                setCorrect(isCorrect(answerChoice));
+                setButtonChange(true);
+                setDisabled(true);
+                setErrorMessage("");
+            } else {
+                setErrorMessage("Please select an answer");
+            }
+        }
+    };
+
+    const handleNextQuestion = () => {
+        if (id !== "kora" && id !== "piggyvest" && id !== "quidax") {
+            if (id) {
+                if (questionIndex < filteredQuiz.length - 1) {
+                    setQuestionIndex(questionIndex + 1);
+                    setCurrentQuestion(filteredQuiz[questionIndex + 1]);
+                    setAnswerChoice('');
+                    setCorrect(false);
+                    setWrong(false);
+                    setDisabled(false);
+                    setButtonChange(false);
+                } else {
+                    setQuizFinished(true)
+                    setQuestionIndex(0);
+                }
+            }
+        }
+        else {
+            if (questionIndex < 10) {
+                setQuestionIndex((currIndex) => currIndex + 1);
+                setAnswerChoice('');
+                fetchNextQuestion(questionIndex + 1, quizId)
+                setCorrect(false);
+                setWrong(false);
+                setButtonChange(false);
+                setDisabled(false);
+            } else {
+                setQuizFinished(true);
+                setQuestionIndex(1);
+            }
+        }
+    };
+
+    useEffect(() => {
+        if (quizFinished) {
+            sendUserScores({ quizId, score })
+        } else {
+            if (score > 0) {
+                fetchNextQuestion(questionIndex, quizId)
+                FetchQuestion(categoryId)
+                setScore(0)
+            }
+        }
+    }, [quizFinished])
+
+    useEffect(() => {
+        if (name) {
+            setUserName(name)
+        }
+    }, [])
+
+    useEffect(() => {
+        if (userName) {
+            handleUserNameSubmit()
+        }
+    }, [name])
+
+    return (
+        <div>
+            {!isUserNameSet ? (
+                <div className='py-4 px-6 md:px-16 gap-[40px] lg:px-0 w-[100vw] lg:w-[800px]'>
+                    <div>
+                        <p onClick={() => navigate("/")} className="cursor-pointer text-sm text-secondary dark:text-secondary-dark mb-3 md:text-xl pb-[20px]">
+                            Back to Home
+                        </p>
+                        <h2 className="text-xl font-medium md:text-4xl">
+                            Enter your Username
+                        </h2>
+                    </div>
+                    <input
+                        placeholder='UserName'
+                        value={userName}
+                        onChange={(e) => setUserName(e.target.value)}
+                        className='bg-white dark:bg-secondary-dark h-12 w-[100%] mt-6 mb-2 p-1 rounded-md text-[24px] pl-[20px]' />
+                    <Button loading={loading} text="Submit" handleClick={handleUserNameSubmit} />
+                    {errorMessage && <p className="text-red-500 text-base pt-[10px]">{errorMessage}</p>}
+                </div>
+            ) : (
+                <div>
+                    {!quizFinished ? (
+                        <div>
+                            {!loading ? (
+                                <div>
+                                    {(id !== "kora" && id !== "piggyvest" && id !== "quidax") ? <div className="flex flex-col gap-10 pt-8 px-6 lg:px-0 lg:grid lg:grid-cols-2 w-[100%] lg:w-[800px]">
+                                        {currentQuestion && (
+                                            <>
+                                                <div className='flex flex-col justify-between'>
+                                                    <div>
+                                                        <p className="text-sm text-secondary dark:text-secondary-dark italic mb-3 md:text-xl">
+                                                            Question {questionIndex + 1} of {filteredQuiz.length}
+                                                        </p>
+                                                        <h2 className="text-xl font-medium md:text-4xl">
+                                                            {currentQuestion.question}
+                                                        </h2>
+                                                    </div>
+                                                    <ProgressBar progress={(questionIndex + 1)} total={filteredQuiz.length} />
+                                                </div>
+                                                <div>
+                                                    <ul className="flex flex-col gap-3">
+                                                        {currentQuestion?.options.map((option: string, idx: number) => (
+                                                            <QuizOption
+                                                                key={idx}
+                                                                option={option}
+                                                                selectedOption={answerChoice}
+                                                                answer={currentQuestion.options[currentQuestion.answer]}
+                                                                id={idx}
+                                                                selected={answerChoice === option}
+                                                                correct={correct && answerChoice === option}
+                                                                wrong={wrong && answerChoice === option}
+                                                                disabled={disabled}
+                                                                handleChange={handleChange}
+                                                            />
+                                                        ))}
+                                                    </ul>
+                                                    {buttonChange ? (
+                                                        <Button text="Next Question" loading={loading} handleClick={handleNextQuestion} />
+                                                    ) : (
+                                                        <Button text="Submit Answer" loading={loading} handleClick={handleAnswerSubmit} />
+                                                    )}
+                                                    {errorMessage && (
+                                                        <span className="flex gap-3 justify-center items-center mt-3 w-full">
+                                                            <p className="text-red-500 text-base pt-[10px]">{errorMessage}</p>
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </>
+                                        )}
+                                    </div> : <div className="flex flex-col gap-10 pt-8 px-6 lg:px-0 lg:grid lg:grid-cols-2 w-[100%] lg:w-[800px]">
+                                        {currentQuestion && (
+                                            <>
+                                                <div className='flex flex-col justify-between'>
+                                                    <div>
+                                                        <p className="text-sm text-secondary dark:text-secondary-dark italic mb-3 md:text-xl">
+                                                            Question {questionIndex} of 10
+                                                        </p>
+                                                        <h2 className="text-xl font-medium md:text-4xl">
+                                                            {currentQuestion.question}
+                                                        </h2>
+                                                    </div>
+                                                    <ProgressBar progress={questionIndex} total={10} />
+                                                </div>
+                                                <div>
+                                                    <ul className="flex flex-col gap-3">
+                                                        {currentQuestion?.options.map((option: string, idx: number) => (
+                                                            <QuizOption
+                                                                key={idx}
+                                                                option={option}
+                                                                selectedOption={answerChoice}
+                                                                answer={currentQuestion.options[currentQuestion.answer]}
+                                                                id={idx}
+                                                                selected={answerChoice === option}
+                                                                correct={correct && answerChoice === option}
+                                                                wrong={wrong && answerChoice === option}
+                                                                disabled={disabled}
+                                                                handleChange={handleChange}
+                                                            />
+                                                        ))}
+                                                    </ul>
+                                                    {buttonChange ? (
+                                                        <div className='flex gap-[10px]'>
+                                                            <Button text="Next Question" loading={loading} handleClick={handleNextQuestion} />
+                                                            <Button text="Cancel Quiz" loading={loading} handleClick={() => navigate("/")} />
+                                                        </div>
+                                                    ) : (
+                                                        <div className='flex gap-[10px]'>
+                                                            <Button text="Submit Answer" loading={loading} handleClick={handleAnswerSubmit} />
+                                                            <Button text="Cancel Quiz" loading={loading} handleClick={() => navigate("/")} />
+                                                        </div>
+                                                    )}
+                                                    {errorMessage && (
+                                                        <span className="flex gap-3 justify-center items-center mt-3 w-full">
+                                                            <p className="text-red-500 text-base pt-[10px]">{errorMessage}</p>
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>}
+                                </div>
+                            ) : (
+                                <div className=''>
+                                    <div className="flex justify-center pt-[200px] sm:pt-[150px]">
+                                        <div className="loader ease-linear rounded-full border-8 border-t-8 border-blacks-four h-[100px] w-[100px]"></div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <Results
+                            total={filteredQuiz.length > 0 ? filteredQuiz.length : 10}
+                            setQuizFinished={setQuizFinished}
+                            userName={userName}
+                            score={score}
+                            quizType={`${id}`}
+                        />
+                    )}
+                </div>
+            )}
+        </div>
+    );
+}
+
+export default Quiz;
