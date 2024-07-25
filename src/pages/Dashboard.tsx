@@ -34,9 +34,9 @@ const Dashboard: React.FC = () => {
             <section className="bg-white dark:bg-secondary-dark p-6 rounded-lg shadow-lg">
                 <h3 className="text-xl font-bold mb-4">Recent Activity</h3>
                {loading ?  "" : <ul>
-                    <li className="mb-2 text-sm md:text-xl capitalize">Created Quiz: {userQuizzes[userQuizzes.length - 1]}</li>
-                    <li className="mb-2 text-sm md:text-xl capitalize">Created Quiz: {userQuizzes[userQuizzes.length - 2]}</li>
-                    <li className="mb-2 text-sm md:text-xl capitalize">Created Quiz: {userQuizzes[userQuizzes.length - 3]}</li>
+                   {userQuizzes.length > 0 && <li className="mb-2 text-sm md:text-xl capitalize">Created Quiz: {userQuizzes[userQuizzes.length - 1]}</li> }
+                   {userQuizzes.length > 1 && <li className="mb-2 text-sm md:text-xl capitalize">Created Quiz: {userQuizzes[userQuizzes.length - 2]}</li> }
+                   {userQuizzes.length > 2 && <li className="mb-2 text-sm md:text-xl capitalize">Created Quiz: {userQuizzes[userQuizzes.length - 3]}</li> }
                 </ul> }
             </section>
         </DashboardLayout>
