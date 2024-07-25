@@ -28,7 +28,7 @@ const ViewQuiz = () => {
         </div> :
           <div className='mt-[20px]'>
             <div className='grid grid-cols-2 sm:grid-cols-2 gap-[20px]'>
-              {userQuizzes.map((e, id) => {
+              {userQuizzes.length > 0 ? userQuizzes.map((e, id) => {
                 return (
                   <p key={id} onClick={() => {
 
@@ -48,7 +48,7 @@ const ViewQuiz = () => {
                     </li>
                   </p>
                 )
-              })}
+              }) : <h1 className='text-sm text-secondary dark:text-secondary-dark mt-10 md:text-xl'>You have not created any quiz. <Link to={"/dashboard/create"} className='hover:underline' >Create Quiz</Link></h1> }
             </div>
           </div>
         }
