@@ -23,6 +23,8 @@ const Signin = () => {
         setLoading(true);
         try {
             const data = await signIn({ userName, password: userPassword });
+            const now = new Date();
+            sessionStorage.setItem("time", JSON.stringify(now.getTime() + 7200000));
             sessionStorage.setItem('access_token', data.data.token);
             sessionStorage.setItem('userName', data.data.userName);
             navigate("/dashboard");
@@ -37,7 +39,7 @@ const Signin = () => {
             <div className='py-4 px-6 lg:px-0 w-[100vw] lg:w-[800px]'>
                 <div>
                     <p className="text-sm text-secondary dark:text-secondary-dark italic md:text-2xl">
-                    Enter your Details
+                        Enter your Details
                     </p>
                     {/* <h2 className="text-xl font-medium md:text-3xl">
                         Enter your Details

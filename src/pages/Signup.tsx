@@ -35,6 +35,8 @@ const Signup = () => {
         setLoading(true);
         try {
             signUp({ firstName, lastName, email, userName, password }).then((data) => {
+                const now = new Date();
+                sessionStorage.setItem("time", JSON.stringify(now.getTime() + 7200000));
                 sessionStorage.setItem('access_token', data.data.token);
                 sessionStorage.setItem('userName', data.data.userName);
                 navigate("/dashboard");
